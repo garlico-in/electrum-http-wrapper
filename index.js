@@ -1,9 +1,10 @@
-const fastify = require('fastify')({
-  logger: true
-});
+import {fastify} from 'fastify';
 import {ElectrumClient} from '@samouraiwallet/electrum-client';
 
+// Create a new Fastify server
+const fastify = require('fastify')({ logger: log })
 const electrum = new ElectrumClient('ssl://electrum.test.digital-assets.local:50002');
+
 
 function convertToScripthash(address) {
   // First, decode the base58-encoded address
@@ -17,6 +18,9 @@ function convertToScripthash(address) {
 }
 
 fastify.post('/api/GRLC/mainnet/tx/send', async (request, reply) => {
+  // Log the request id
+  console.log(request.id)
+
   // Parse the raw transaction from the request body
   const rawTransaction = request.body;
 
@@ -32,6 +36,9 @@ fastify.post('/api/GRLC/mainnet/tx/send', async (request, reply) => {
 });
 
 fastify.get('/api/GRLC/mainnet/address/:address/balance', async (request, reply) => {
+  // Log the request id
+  console.log(request.id)
+  
   // Get the garlicoin address from the request parameters
   const address = request.params.address
 
