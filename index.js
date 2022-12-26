@@ -22,6 +22,14 @@ setInterval(async () => {
     console.log('Reconnecting to electrum server...');
     electrum = new ElectrumClient(50002, 'electrum.test.digital-assets.local', 'ssl');
     console.log('Connected to electrum server!');
+    console.log('Pinging server...');
+    try{
+      await electrum.server_ping();
+      console.log('Server pinged successfully!');
+    }catch(e){
+      console.log(e);
+      console.log('Server ping failed!');
+    }
   }
 }, 15000);
 
