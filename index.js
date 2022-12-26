@@ -1,5 +1,5 @@
 import fastify from 'fastify';
-import {ElectrumClient} from '@samouraiwallet/electrum-client';
+import {ElectrumClient} from 'electrum-client-js';
 import garlicoinjs from 'garlicoinjs-lib';
 
 // Create a new Fastify server
