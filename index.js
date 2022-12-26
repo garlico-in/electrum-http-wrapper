@@ -6,7 +6,7 @@ import garlicoinjs from 'garlicoinjs-lib';
 const server = fastify({logger: true});
 
 try{
-  const electrum = await new ElectrumClient(50002, 'electrum.test.digital-assets.local', 'ssl');
+  const electrum = await new ElectrumClient(50002, 'electrumx.garlico.in', 'ssl');
   console.log('connected to electrum server');
 }catch(e){
   console.log(e);
@@ -14,7 +14,7 @@ try{
 
 function convertToScripthash(address) {
   
-  return garlicore.address.toOutputScript(address)
+  return garlicoinjs.address.toOutputScript(address);
 
 }
 
