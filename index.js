@@ -1,4 +1,4 @@
-import {ElectrumClient} from '@samouraiwallet/electrum-client';
+const ElectrumClient = require('@samouraiwallet/electrum-client');
 
 // Create a new Fastify server
 const fastify = require('fastify')({ logger: log })
