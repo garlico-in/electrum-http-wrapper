@@ -56,6 +56,39 @@ fastify.get('/api/GRLC/mainnet/address/:address/balance', async (request, reply)
   }
 })
 
+fastify.get('/api/GRLC/mainnet/address/:address/unspent', async (request, reply) => {
+  // Log the request id
+  console.log(request.id)
+
+  // Get the garlicoin address from the request parameters
+  const address = request.params.address
+
+  // Convert the address to a scripthash
+  const scripthash = convertToScripthash(address);
+
+  // Connect to the ElectrumX server and get unspent outputs
+  try {
+    const response = await electrum.request('blockchain.scripthash.listunspent', scripthash);
+
+    // Send the response from the ElectrumX server back to the client
+    reply.send(response);
+  } catch (error) {
+    reply.send(error);
+  }
+})
+
+fastify.get('/api/GRLC/mainnet/tx/:txid', (request, reply) => {
+  // Log the request id
+  console.log(request.id)
+
+  // Get the transaction id from the request parameters
+  const txid = request.params.txid
+
+  // Create a link to the transaction on the blockchain explorer
+  const link = `https://explorer.grlc.eu/tx.php?tx=${txid}`
+  reply.send({ link })
+})
+
 // Start the server
 fastify.listen(3000, (err, address) => {
   if (err) throw err;
