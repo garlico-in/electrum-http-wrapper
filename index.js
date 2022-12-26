@@ -1,7 +1,6 @@
 import fastify from 'fastify';
 import {ElectrumClient} from '@samouraiwallet/electrum-client';
-import base58 from 'base58';
-import garlicore from 'garlicore-lib';
+import garlicoinjs from 'garlicoinjs-lib';
 
 // Create a new Fastify server
 const server = fastify({logger: true});
@@ -15,7 +14,7 @@ try{
 
 function convertToScripthash(address) {
   
-  return garlicore.Address.convertToScripthash(address);
+  return garlicore.address.toOutputScript(address)
 
 }
 
