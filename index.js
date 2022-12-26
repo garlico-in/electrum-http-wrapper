@@ -61,7 +61,7 @@ server.get('/api/GRLC/mainnet/address/:address/balance', async (request, reply) 
   }
 })
 
-server.get('/api/GRLC/mainnet/address/:address/unspent', async (request, reply) => {
+server.get('/api/GRLC/mainnet/address/:address/?unspent=true&limit=0', async (request, reply) => {
   // Log the request id
   console.log(request.id)
 
@@ -82,7 +82,7 @@ server.get('/api/GRLC/mainnet/address/:address/unspent', async (request, reply) 
   }
 })
 
-server.get('/api/GRLC/mainnet/tx/:txid', async (request, reply) => {
+server.get('/#/GRLC/mainnet/tx/:txid', async (request, reply) => {
   // Log the request id
   console.log(request.id)
 
