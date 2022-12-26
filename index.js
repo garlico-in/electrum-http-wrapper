@@ -93,6 +93,13 @@ server.get('/api/GRLC/mainnet/tx/:txid', async (request, reply) => {
   reply.send({ link })
 })
 
+server.get('/healthcheck', async (request, reply) => {
+  // Log the request id
+  console.log(request.id)
+  
+  reply.code(200).send()
+})
+
 // Start the server
 server.listen(3000, (err, address) => {
   if (err) throw err;
