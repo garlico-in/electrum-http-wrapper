@@ -1,37 +1,19 @@
 import fastify from 'fastify';
-import ElectrumClient from 'electrum-client-js';
+import {ElectrumClient} from '@samouraiwallet/electrum-client';
 import garlicoinjs from 'garlicoinjs-lib';
 
 // Create a new Fastify server
 const server = fastify({logger: true});
-
-let electrum;
-
-try{
-  electrum = new ElectrumClient(50002, 'electrum.test.digital-assets.local', 'ssl');
-  console.log('Connected to electrum server!');
-}catch(e){
-  console.log(e);
+const client = new ElectrumClient(50002, 'uk.garlium.crapules.org', 'tls');
+try {
+  client.initElectrum({client: 'electrum-client-js', version: ['1.2', '1.4']}, {
+    retryPeriod: 5000,
+    maxRetry: 10,
+    pingPeriod: 5000,
+});
+}catch(error){
+  console.log(error);
 }
-
-setInterval(async () => {
-  try {
-    await electrum.server_ping();
-  } catch (error) {
-    console.log(error);
-    console.log('Reconnecting to electrum server...');
-    electrum = new ElectrumClient(50002, 'electrum.test.digital-assets.local', 'ssl');
-    console.log('Connected to electrum server!');
-    console.log('Pinging server...');
-    try{
-      await electrum.server_ping();
-      console.log('Server pinged successfully!');
-    }catch(e){
-      console.log(e);
-      console.log('Server ping failed!');
-    }
-  }
-}, 15000);
 
 function convertToScripthash(address) {
   
@@ -48,7 +30,7 @@ server.post('/api/GRLC/mainnet/tx/send', async (request, reply) => {
 
   // Connect to the ElectrumX server and send the transaction
   try {
-    const response = await electrum.blockchainTransaction_broadcast(rawTransaction);
+    const response = await client.blockchainTransaction_broadcast(rawTransaction);
 
     // Send the response from the ElectrumX server back to the client
     reply.send(response);
@@ -69,7 +51,7 @@ server.get('/api/GRLC/mainnet/address/:address/balance', async (request, reply) 
 
   // Connect to the ElectrumX server and send the transaction
   try {
-    const response = await electrum.blockchainScripthash_getBalance(scripthash);
+    const response = await client.blockchainScripthash_getBalance(scripthash);
 
     // Send the response from the ElectrumX server back to the client
     reply.send(response);
@@ -90,7 +72,7 @@ server.get('/api/GRLC/mainnet/address/:address/?unspent=true&limit=0', async (re
 
   // Connect to the ElectrumX server and get unspent outputs
   try {
-    const response = await electrum.blockchainScripthash_listunspent(scripthash);
+    const response = await client.blockchainScripthash_listunspent(scripthash);
 
     // Send the response from the ElectrumX server back to the client
     reply.send(response);
