@@ -15,7 +15,7 @@ try{
 
 function convertToScripthash(address) {
   
-  return garlicore.address.toOutputScript(address)
+  return garlicore.Address.convertToScripthash(address);
 
 }
 
