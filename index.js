@@ -8,7 +8,7 @@ const server = fastify({logger: true});
 let electrum;
 
 try{
-  electrum = await new ElectrumClient(50004, 'electrum.test.digital-assets.local', 'wss');
+  electrum = new ElectrumClient(50002, 'electrum.test.digital-assets.local', 'ssl');
   console.log('Connected to electrum server!');
 }catch(e){
   console.log(e);
@@ -20,7 +20,7 @@ setInterval(async () => {
   } catch (error) {
     console.log(error);
     console.log('Reconnecting to electrum server...');
-    electrum = await new ElectrumClient(50004, 'electrum.test.digital-assets.local', 'wss');
+    electrum = new ElectrumClient(50002, 'electrum.test.digital-assets.local', 'ssl');
     console.log('Connected to electrum server!');
   }
 }, 15000);
