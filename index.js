@@ -3,8 +3,12 @@ import {ElectrumClient} from '@samouraiwallet/electrum-client';
 
 // Create a new Fastify server
 const fastify = require('fastify')({ logger: log })
-const electrum = new ElectrumClient('ssl://electrum.test.digital-assets.local:50002');
 
+try{
+  const electrum = new ElectrumClient('ssl://electrum.test.digital-assets.local:50002');
+}catch(e){
+  console.log(e);
+}
 
 function convertToScripthash(address) {
   // First, decode the base58-encoded address
