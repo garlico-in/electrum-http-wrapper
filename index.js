@@ -102,8 +102,11 @@ server.get('/healthcheck', async (request, reply) => {
 })
 
 // Start the server
-server.listen(3000, (err, address) => {
-  if (err) throw err;
+server.listen(3000, '0.0.0.0', async (error, address) => {
+  if (error) {
+    console.error(error);
+    process.exit(1);
+  }
   server.log.info(`server listening on ${address}`);
 });
 
