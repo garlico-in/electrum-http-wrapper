@@ -77,7 +77,7 @@ fastify.get('/api/GRLC/mainnet/address/:address/unspent', async (request, reply)
   }
 })
 
-fastify.get('/api/GRLC/mainnet/tx/:txid', (request, reply) => {
+fastify.get('/api/GRLC/mainnet/tx/:txid', async (request, reply) => {
   // Log the request id
   console.log(request.id)
 
