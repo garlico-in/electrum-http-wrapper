@@ -1,4 +1,3 @@
-import {fastify} from 'fastify';
 import {ElectrumClient} from '@samouraiwallet/electrum-client';
 
 // Create a new Fastify server
