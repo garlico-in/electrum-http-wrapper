@@ -1,0 +1,19 @@
+{
+  "name": "electrum-http-wrapper",
+  "version": "1.0.0",
+  "description": "HTTP wrapper for Electrumx",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/garlico-in/electrum-http-wrapper.git"
+  },
+  "author": "jorge@garlicoin.io",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/garlico-in/electrum-http-wrapper/issues"
+  },
+  "homepage": "https://github.com/garlico-in/electrum-http-wrapper#readme"
+}
