@@ -5,7 +5,8 @@ import {ElectrumClient} from '@samouraiwallet/electrum-client';
 const server = fastify({logger: true});
 
 try{
-  const electrum = new ElectrumClient(50002, 'electrum.test.digital-assets.local', 'ssl');
+  const electrum = await new ElectrumClient(50002, 'electrum.test.digital-assets.local', 'ssl');
+  console.log('connected to electrum server');
 }catch(e){
   console.log(e);
 }
@@ -96,7 +97,7 @@ server.get('/api/GRLC/mainnet/tx/:txid', async (request, reply) => {
 server.get('/healthcheck', async (request, reply) => {
   // Log the request id
   console.log(request.id)
-  
+
   reply.code(200).send()
 })
 
