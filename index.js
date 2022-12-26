@@ -8,11 +8,22 @@ const server = fastify({logger: true});
 let electrum;
 
 try{
-  electrum = await new ElectrumClient(50002, 'electrumx.garlico.in', 'ssl');
-  console.log('connected to electrum server');
+  electrum = await new ElectrumClient(50002, 'electrum.test.digital-assets.local', 'ssl');
+  console.log('Connected to electrum server!');
 }catch(e){
   console.log(e);
 }
+
+setInterval(async () => {
+  try {
+    await electrum.server_ping();
+  } catch (error) {
+    console.log(error);
+    console.log('Reconnecting to electrum server...');
+    electrum = await new ElectrumClient(50002, 'electrum.test.digital-assets.local', 'ssl');
+    console.log('Connected to electrum server!');
+  }
+}, 15000);
 
 function convertToScripthash(address) {
   
