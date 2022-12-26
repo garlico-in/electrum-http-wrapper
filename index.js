@@ -1,10 +1,11 @@
+import fastify from 'fastify';
 import {ElectrumClient} from '@samouraiwallet/electrum-client';
 
 // Create a new Fastify server
-const fastify = require('fastify')({ logger: log })
+const server = fastify({logger: true});
 
 try{
-  const electrum = new ElectrumClient('ssl://electrum.test.digital-assets.local:50002');
+  const electrum = new ElectrumClient(50002, 'electrum.test.digital-assets.local', 'ssl');
 }catch(e){
   console.log(e);
 }
@@ -20,7 +21,7 @@ function convertToScripthash(address) {
   return scripthash.toString('hex');
 }
 
-fastify.post('/api/GRLC/mainnet/tx/send', async (request, reply) => {
+server.post('/api/GRLC/mainnet/tx/send', async (request, reply) => {
   // Log the request id
   console.log(request.id)
 
@@ -38,7 +39,7 @@ fastify.post('/api/GRLC/mainnet/tx/send', async (request, reply) => {
   }
 });
 
-fastify.get('/api/GRLC/mainnet/address/:address/balance', async (request, reply) => {
+server.get('/api/GRLC/mainnet/address/:address/balance', async (request, reply) => {
   // Log the request id
   console.log(request.id)
   
@@ -59,7 +60,7 @@ fastify.get('/api/GRLC/mainnet/address/:address/balance', async (request, reply)
   }
 })
 
-fastify.get('/api/GRLC/mainnet/address/:address/unspent', async (request, reply) => {
+server.get('/api/GRLC/mainnet/address/:address/unspent', async (request, reply) => {
   // Log the request id
   console.log(request.id)
 
@@ -80,7 +81,7 @@ fastify.get('/api/GRLC/mainnet/address/:address/unspent', async (request, reply)
   }
 })
 
-fastify.get('/api/GRLC/mainnet/tx/:txid', async (request, reply) => {
+server.get('/api/GRLC/mainnet/tx/:txid', async (request, reply) => {
   // Log the request id
   console.log(request.id)
 
@@ -93,8 +94,8 @@ fastify.get('/api/GRLC/mainnet/tx/:txid', async (request, reply) => {
 })
 
 // Start the server
-fastify.listen(3000, (err, address) => {
+server.listen(3000, (err, address) => {
   if (err) throw err;
-  fastify.log.info(`server listening on ${address}`);
+  server.log.info(`server listening on ${address}`);
 });
 
