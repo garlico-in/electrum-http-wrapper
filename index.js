@@ -8,7 +8,7 @@ const server = fastify({logger: true});
 let electrum;
 
 try{
-  electrum = await new ElectrumClient(50002, 'electrum.test.digital-assets.local', 'ssl');
+  electrum = await new ElectrumClient(50004, 'electrum.test.digital-assets.local', 'wss');
   console.log('Connected to electrum server!');
 }catch(e){
   console.log(e);
@@ -20,7 +20,7 @@ setInterval(async () => {
   } catch (error) {
     console.log(error);
     console.log('Reconnecting to electrum server...');
-    electrum = await new ElectrumClient(50002, 'electrum.test.digital-assets.local', 'ssl');
+    electrum = await new ElectrumClient(50004, 'electrum.test.digital-assets.local', 'wss');
     console.log('Connected to electrum server!');
   }
 }, 15000);
@@ -40,7 +40,7 @@ server.post('/api/GRLC/mainnet/tx/send', async (request, reply) => {
 
   // Connect to the ElectrumX server and send the transaction
   try {
-    const response = await electrum.request('blockchain.transaction.broadcast', rawTransaction);
+    const response = await electrum.blockchainTransaction_broadcast(rawTransaction);
 
     // Send the response from the ElectrumX server back to the client
     reply.send(response);
@@ -61,7 +61,7 @@ server.get('/api/GRLC/mainnet/address/:address/balance', async (request, reply) 
 
   // Connect to the ElectrumX server and send the transaction
   try {
-    const response = await electrum.request('blockchain.scripthash.get_balance', scripthash);
+    const response = await electrum.blockchainScripthash_getBalance(scripthash);
 
     // Send the response from the ElectrumX server back to the client
     reply.send(response);
@@ -82,7 +82,7 @@ server.get('/api/GRLC/mainnet/address/:address/?unspent=true&limit=0', async (re
 
   // Connect to the ElectrumX server and get unspent outputs
   try {
-    const response = await electrum.request('blockchain.scripthash.listunspent', scripthash);
+    const response = await electrum.blockchainScripthash_listunspent(scripthash);
 
     // Send the response from the ElectrumX server back to the client
     reply.send(response);
