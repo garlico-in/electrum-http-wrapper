@@ -17,7 +17,7 @@ try {
 
 function convertToScripthash(address) {
   
-  return garlicoinjs.address.toOutputScript(address);
+  return garlicoinjs.address.toOutputScript(address).toString('hex');
 
 }
 
