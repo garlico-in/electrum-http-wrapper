@@ -1,5 +1,6 @@
 import fastify from 'fastify';
 import {ElectrumClient} from '@samouraiwallet/electrum-client';
+import base58 from 'base58';
 
 // Create a new Fastify server
 const server = fastify({logger: true});
@@ -82,7 +83,7 @@ server.get('/api/GRLC/mainnet/address/:address/?unspent=true&limit=0', async (re
   }
 })
 
-server.get('/#/GRLC/mainnet/tx/:txid', async (request, reply) => {
+server.get('/api/GRLC/mainnet/tx/:txid', async (request, reply) => {
   // Log the request id
   console.log(request.id)
 
