@@ -5,8 +5,10 @@ import garlicoinjs from 'garlicoinjs-lib';
 // Create a new Fastify server
 const server = fastify({logger: true});
 
+let electrum;
+
 try{
-  const electrum = await new ElectrumClient(50002, 'electrumx.garlico.in', 'ssl');
+  electrum = await new ElectrumClient(50002, 'electrumx.garlico.in', 'ssl');
   console.log('connected to electrum server');
 }catch(e){
   console.log(e);
