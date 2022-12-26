@@ -1,5 +1,5 @@
 import fastify from 'fastify';
-import {ElectrumClient} from 'electrum-client-js';
+import ElectrumClient from 'electrum-client-js';
 import garlicoinjs from 'garlicoinjs-lib';
 
 // Create a new Fastify server
