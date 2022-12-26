@@ -19,7 +19,8 @@
   "dependencies": {
     "@samouraiwallet/electrum-client": "^1.3.0",
     "base58": "^2.0.1",
-    "fastify": "^4.10.2"
+    "fastify": "^4.10.2",
+    "garlicore-lib": "^0.1.4"
   },
   "type": "module"
 }

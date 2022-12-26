@@ -1,6 +1,7 @@
 import fastify from 'fastify';
 import {ElectrumClient} from '@samouraiwallet/electrum-client';
 import base58 from 'base58';
+import garlicore from 'garlicore-lib';
 
 // Create a new Fastify server
 const server = fastify({logger: true});
@@ -13,14 +14,9 @@ try{
 }
 
 function convertToScripthash(address) {
-  // First, decode the base58-encoded address
-  const decoded = base58.decode(address);
+  
+  return garlicore.address.toOutputScript(address)
 
-  // Next, take the first 4 bytes of the decoded address and reverse the order
-  const scripthash = decoded.slice(0, 4).reverse();
-
-  // Finally, encode the scripthash in hexadecimal format
-  return scripthash.toString('hex');
 }
 
 server.post('/api/GRLC/mainnet/tx/send', async (request, reply) => {
@@ -83,18 +79,6 @@ server.get('/api/GRLC/mainnet/address/:address/?unspent=true&limit=0', async (re
   }
 })
 
-server.get('/api/GRLC/mainnet/tx/:txid', async (request, reply) => {
-  // Log the request id
-  console.log(request.id)
-
-  // Get the transaction id from the request parameters
-  const txid = request.params.txid
-
-  // Create a link to the transaction on the blockchain explorer
-  const link = `https://explorer.grlc.eu/tx.php?tx=${txid}`
-  reply.send({ link })
-})
-
 server.get('/healthcheck', async (request, reply) => {
   // Log the request id
   console.log(request.id)
@@ -103,7 +87,7 @@ server.get('/healthcheck', async (request, reply) => {
 })
 
 // Start the server
-server.listen(3000, '0.0.0.0', async (error, address) => {
+server.listen({ port: 3000, host: '0.0.0.0' }, async (error, address) => {
   if (error) {
     console.error(error);
     process.exit(1);
