@@ -129,7 +129,7 @@ server.get('/api/GRLC/mainnet/address/:address/balance', async (request, reply) 
   // Connect to the ElectrumX server and send the transaction
   try {
     
-    const responses = await Promise.all(clientMap.map(client => {
+    const responses = await Promise.all(clientMap.forEach(client => {
       console.log('client:', client);
       return client.blockchainScripthash_getBalance(scripthash);
     }));
