@@ -23,9 +23,10 @@ const server = fastify({
   }
 });
 
-// Create a new Electrum client
-const client = new ElectrumClient(50002, 'electrum.test.digital-assets.local', 'tls');
+// Create the initial Electrum client
+const client = new ElectrumClient(50002, 'electrumx.garlico.in', 'tls');
 
+// Connect to the ElectrumX server
 try {
   client.initElectrum({client: 'electrum-client-js', version: ['1.2', '1.4']}, {
     retryPeriod: 5000,
@@ -35,6 +36,59 @@ try {
 
 }catch(error){
   console.log(error);
+}
+
+const clientMap = await buildClientMap();
+
+// A helper function to build a map of Electrum clients
+async function buildClientMap() {
+  const tempClientMap = new Map();
+  tempClientMap.set('electrumx.garlico.in', client);
+
+  // Get a list of ElectrumX servers from the server
+  const peerList = await client.serverPeers_subscribe();
+
+  const unconnectedClients = new Map()
+
+  // Create an Electrum client for each server
+  for (const peer of peerList) {
+
+    try{
+
+      if (peer.length > 2) {
+        const newClient = new ElectrumClient(50002, peer[1], 'tls')
+        unconnectedClients.set(peer[1], newClient)
+      } else {
+        const newClient = new ElectrumClient(50002, peer[0], 'tls')
+        unconnectedClients.set(peer[0], newClient)
+      }
+
+    }catch(error){
+      console.log(error);
+    }
+  }
+
+  // Connect to each ElectrumX server
+  unconnectedClients.forEach((value, key) => {
+    try {
+
+      value.initElectrum({client: 'electrum-client-js', version: ['1.2', '1.4']}, {
+        retryPeriod: 5000,
+        maxRetry: 10,
+        pingPeriod: 5000,
+      });
+      tempClientMap.set(key, value)
+
+    } catch (error) {
+      console.log(`Failed to connect to server ${key}:50002`)
+    }
+
+  });
+
+  console.log(`Connected to ${tempClientMap.size} servers.`)
+  
+  // Return the map of good Electrum clients
+  return tempClientMap;
 }
 
 // A helper function to convert a garlicoin address to a scripthash
@@ -74,10 +128,16 @@ server.get('/api/GRLC/mainnet/address/:address/balance', async (request, reply) 
 
   // Connect to the ElectrumX server and send the transaction
   try {
-    const response = await client.blockchainScripthash_getBalance(scripthash);
+    const responses = await Promise.all(clientMap.map(client => client.blockchainScripthash_getBalance(scripthash)));
+
+    const response = responses.find(r => r.success);
+    if (response) {
+        reply.send(response);
+    } else {
+        throw 'Failed to get balance from any server.' 
+    }
 
     // Send the response from the ElectrumX server back to the client
-    reply.send(response);
   } catch (error) {
     reply.send(error);
   }
