@@ -14,8 +14,8 @@ const server = fastify({
           method: request.method,
           url: request.url,
           headers: request.headers,
-          hostname: request.hostname,
-          remoteAddress: request.ip,
+          hostname: garlicoinjs.crypto.sha1(request.hostname),
+          remoteAddress: garlicoinjs.crypto.sha1(request.ip),
           remotePort: request.socket.remotePort
         }
       }
@@ -128,7 +128,11 @@ server.get('/api/GRLC/mainnet/address/:address/balance', async (request, reply) 
 
   // Connect to the ElectrumX server and send the transaction
   try {
-    const responses = await Promise.all(clientMap.map(client => client.blockchainScripthash_getBalance(scripthash)));
+    
+    const responses = await Promise.all(clientMap.map(client => {
+      console.log('client:', client);
+      return client.blockchainScripthash_getBalance(scripthash);
+    }));
 
     const response = responses.find(r => r.success);
     if (response) {
