@@ -188,23 +188,6 @@ function convertToScripthash(address) {
 
 }
 
-// A route that sends a raw transaction to the ElectrumX server
-server.post('/api/GRLC/mainnet/tx/send', async (request, reply) => {
-
-  // Parse the raw transaction from the request body
-  const rawTransaction = request.body;
-
-  // Connect to the ElectrumX server and send the transaction
-  try {
-    const response = await client.blockchainTransaction_broadcast(rawTransaction);
-
-    // Send the response from the ElectrumX server back to the client
-    reply.send(response);
-  } catch (error) {
-    reply.send(error);
-  }
-});
-
 // A route that gets the balance of a garlicoin address
 server.get('/api/GRLC/mainnet/address/:address/balance', async (request, reply) => {
   
@@ -226,7 +209,7 @@ server.get('/api/GRLC/mainnet/address/:address/balance', async (request, reply) 
 })
 
 // A route that gets the unspent outputs of a garlicoin address
-server.get('/api/GRLC/mainnet/address/:address*', async (request, reply) => {
+server.get('/api/GRLC/mainnet/address/:address/', async (request, reply) => {
 
     // Get the garlicoin address from the request parameters
     const address = request.params.address
