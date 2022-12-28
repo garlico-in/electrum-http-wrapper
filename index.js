@@ -228,21 +228,29 @@ server.get('/api/GRLC/mainnet/address/:address/balance', async (request, reply) 
 // A route that gets the unspent outputs of a garlicoin address
 server.get('/api/GRLC/mainnet/address/:address*', async (request, reply) => {
 
-  // Get the garlicoin address from the request parameters
-  const address = request.params.address
+    // Get the garlicoin address from the request parameters
+    const address = request.params.address
 
-  // Convert the address to a scripthash
-  const scripthash = convertToScripthash(address);
+    // Convert the address to a scripthash
+    const scripthash = convertToScripthash(address);
 
-  // Connect to the ElectrumX server and get unspent outputs
-  try {
-    const response = await client.blockchainScripthash_listunspent(scripthash);
+    // Connect to the ElectrumX server and get unspent outputs
+    try {
+        const response = await client.blockchainScripthash_listunspent(scripthash);
+        const utxos = response.map(function (utxo) {
+            return {
+                mintTxid: utxo.tx_hash,
+                mintIndex: utxo.tx_pos,
+                value: utxo.value
+            };
+        });
 
-    // Send the response from the ElectrumX server back to the client
-    reply.send(response);
-  } catch (error) {
-    reply.send(error);
-  }
+        // Send the response from the ElectrumX server back to the client
+        reply.send(utxos);
+    } catch (error) {
+        reply.send(error);
+    }
+
 })
 
 server.get('/api/GRLC/mainnet/peers', async (request, reply) => {
@@ -268,6 +276,47 @@ server.get('/healthcheck', async (request, reply) => {
     fastify.log.error(error)
   }
 })
+
+// Remove hash # from url
+server.get('/', async (request, reply) => {
+  try {
+      let response = '<script> const hash = window.location.hash;' +
+          'if (hash.length > 0 && hash.includes("#/")) {' +
+          'window.location.replace(window.location.href.replace("#/", ""));' +
+          '} </script >';
+      reply.type('text/html')
+      reply.send(response);
+  } catch (error) {
+      reply.send(error);
+  }
+})
+
+server.get('/GRLC/mainnet/tx/:txid', async (request, reply) => {
+  const txid = request.params.txid
+  try {
+      let response = 'https://explorer.grlc.eu/get.php?q=' + txid;
+      reply.redirect(response);
+  } catch (error) {
+      reply.send(error);
+  }
+})
+
+// A route that sends a raw transaction to the ElectrumX server
+server.post('/api/GRLC/mainnet/tx/send', async (request, reply) => {
+
+  // Connect to the ElectrumX server and send the transaction
+  try {
+      // Parse the raw transaction from the request body
+      const rawTransaction = request.body.rawTx;
+      let response = await client.blockchainTransaction_broadcast(rawTransaction);
+      response = { txid: response }
+
+      // Send the response from the ElectrumX server back to the client
+      reply.send(response);
+  } catch (error) {
+      reply.send(error);
+  }
+});
 
 // Start the server
 server.listen({ port: 3000, host: '0.0.0.0' }, async (error, address) => {
