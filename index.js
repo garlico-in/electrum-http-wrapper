@@ -60,7 +60,7 @@ async function initServer() {
   }
 
   }catch(error){
-    fastify.log.error(error);
+    console.error(error);
   }
 
 }
@@ -106,16 +106,16 @@ async function checkBestElectrumServer(electrumClientsMap, interval) {
     }
   
     // Set the best Electrum client as the global client
-    fastify.log.info(`The best Electrum server is ${bestServer} with an average response time of ${bestResponseTime.toFixed(2)}ms`);
-    fastify.log.info('Changing the global Electrum client to ${bestServer}')
+    console..info(`The best Electrum server is ${bestServer} with an average response time of ${bestResponseTime.toFixed(2)}ms`);
+    console..info('Changing the global Electrum client to ${bestServer}')
 
     // Change the global Electrum client to the best server
     try{
       client = electrumClientsMap.get(bestServer);
-      fastify.log.info('Global Electrum client changed successfully.')
+      console.info('Global Electrum client changed successfully.')
     }catch(error){
-      fastify.log.error(error);
-      fastify.log.error('Failed to change global Electrum client.')
+      consoleerror(error);
+      console..error('Failed to change global Electrum client.')
     }
   }, interval);
 }
@@ -205,6 +205,7 @@ server.get('/api/GRLC/mainnet/address/:address/balance', async (request, reply) 
     reply.send(response);
   } catch (error) {
     reply.send(error);
+    fastify.log.erro(error);
   }
 })
 
@@ -232,6 +233,7 @@ server.get('/api/GRLC/mainnet/address/:address/', async (request, reply) => {
         reply.send(utxos);
     } catch (error) {
         reply.send(error);
+        fastify.log.error(error)
     }
 
 })
@@ -271,6 +273,7 @@ server.get('/', async (request, reply) => {
       reply.send(response);
   } catch (error) {
       reply.send(error);
+      fastify.log.error(error)
   }
 })
 
@@ -281,6 +284,7 @@ server.get('/GRLC/mainnet/tx/:txid', async (request, reply) => {
       reply.redirect(response);
   } catch (error) {
       reply.send(error);
+      fastify.log.error(error)
   }
 })
 
@@ -298,6 +302,7 @@ server.post('/api/GRLC/mainnet/tx/send', async (request, reply) => {
       reply.send(response);
   } catch (error) {
       reply.send(error);
+      fastify.log.error(error)
   }
 });
 
