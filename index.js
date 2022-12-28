@@ -27,7 +27,7 @@ const server = fastify({
           url: request.url,
           // TODO: remove headers with sensitive information
           headers: request.headers,
-          "x-forwarded-for": garlicoinjs.crypto.sha1(request.headers['x-forwarded-for']),
+          //"x-forwarded-for": garlicoinjs.crypto.sha1(request.headers['x-forwarded-for']),
           // Mask the hostname with a hash
           hostname: garlicoinjs.crypto.sha1(request.hostname).toString('hex'),
           // Mask the IP address with a hash

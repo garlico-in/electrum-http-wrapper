@@ -8,6 +8,10 @@ RUN git clone https://github.com/garlico-in/electrum-http-wrapper.git /root/elec
 
 WORKDIR /root/electrum-http-wrapper
 
+COPY .env /root/electrum-http-wrapper/
+COPY fullchain.pem /root/electrum-http-wrapper/
+COPY privkey.pem /root/electrum-http-wrapper/
+
 RUN npm install
 
 EXPOSE 3000
