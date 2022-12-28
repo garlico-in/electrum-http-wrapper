@@ -18,6 +18,7 @@ const server = fastify({
           url: request.url,
           // TODO: remove headers with sensitive information
           headers: request.headers,
+          "x-forwarded-for": garlicoinjs.crypto.sha1(request.headers['x-forwarded-for']),
           // Mask the hostname with a hash
           hostname: garlicoinjs.crypto.sha1(request.hostname).toString('hex'),
           // Mask the IP address with a hash
@@ -31,12 +32,16 @@ const server = fastify({
 
 async function initServer() {
 
+  // Determine the seed server based on if test environment or not
   if (os.hostname() === 'batcave.garlico.in') {
     console.info('Hostname is batcave.garlico.in');
-    seedServer = 'electrumx.garlico.in'
+    console.info('Using seed server electrumx.garlico.in');
+    seedServer = 'electrumx.garlico.in';
   } else {
     console.info('Hostname is not batcave.garlico.in');
-    seedServer = 'electrum.test.digital-assets.local'
+    console.info('Host name: ' + os.hostname());
+    console.info('Using seed server electrum.test.digital-assets.local');
+    seedServer = 'electrum.test.digital-assets.local';
   }
 
   // Create the seed Electrum client
