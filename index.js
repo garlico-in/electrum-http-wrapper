@@ -106,8 +106,8 @@ async function checkBestElectrumServer(electrumClientsMap, interval) {
     }
   
     // Set the best Electrum client as the global client
-    console..info(`The best Electrum server is ${bestServer} with an average response time of ${bestResponseTime.toFixed(2)}ms`);
-    console..info('Changing the global Electrum client to ${bestServer}')
+    console.info(`The best Electrum server is ${bestServer} with an average response time of ${bestResponseTime.toFixed(2)}ms`);
+    console.info('Changing the global Electrum client to ${bestServer}')
 
     // Change the global Electrum client to the best server
     try{
@@ -115,7 +115,7 @@ async function checkBestElectrumServer(electrumClientsMap, interval) {
       console.info('Global Electrum client changed successfully.')
     }catch(error){
       consoleerror(error);
-      console..error('Failed to change global Electrum client.')
+      console.error('Failed to change global Electrum client.')
     }
   }, interval);
 }
