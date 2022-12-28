@@ -1,11 +1,20 @@
+import dotenv from 'dotenv';
+dotenv.config()
 import fastify from 'fastify';
 import {ElectrumClient} from '@samouraiwallet/electrum-client';
 import garlicoinjs from 'garlicoinjs-lib';
+import fetch from 'node-fetch';
 import os from 'os';
+import fs from 'fs';
 
 let seedServer
 let client
 let clientMap
+
+const privateKey = fs.readFileSync('./privkey.pem', 'utf8');
+const certificate = fs.readFileSync('./fullchain.pem', 'utf8');
+const fcm_key = process.env.FCM_KEY;
+
 const server = fastify({
   logger: {
     redact: ['req.headers.authorization'],
@@ -27,6 +36,10 @@ const server = fastify({
         }
       }
     }
+  },
+  https: {
+    key: privateKey,
+    cert: certificate
   }
 });
 
@@ -112,7 +125,7 @@ async function checkBestElectrumServer(electrumClientsMap, interval) {
   
     // Set the best Electrum client as the global client
     console.info(`The best Electrum server is ${bestServer} with an average response time of ${bestResponseTime.toFixed(2)}ms`);
-    console.info('Changing the global Electrum client to ${bestServer}')
+    console.info(`Changing the global Electrum client to ${bestServer}`)
 
     // Change the global Electrum client to the best server
     try{
@@ -308,6 +321,77 @@ server.post('/api/GRLC/mainnet/tx/send', async (request, reply) => {
   } catch (error) {
       reply.send(error);
       fastify.log.error(error)
+  }
+});
+
+server.get('/gwl/delete/:token', async function (request, reply) {
+  const token = request.params.token;
+  fastify.log.info(`Delete request by: ${token}`)
+  let topics;
+  try {
+      // Get all topics the token is subscribed to, in order to then delete them one by one
+      let sub_topics = [];
+      let response = await fetch(`https://iid.googleapis.com/iid/info/${token}?details=true`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json', 'Authorization': "key=" + fcm_key }
+      });
+      response = await response.json();
+      topics = response.rel?.topics || [];
+      for (let topic in topics) sub_topics.push(topic);
+      if (response.error) {
+          fastify.log.error("ERROR retrieving subscribed topics: " + response.error.toString());
+          topics = "error";
+      };
+  } catch (e) {
+      topics = "error";
+      fastify.log.error("ERROR fetching subscribed topics: " + e.toString());
+  }
+  if (topics == "error") {
+      reply.send({ success: false });
+      return;
+  }
+  // Delete all topics the token is subscribed to
+  try {
+      if (topics) {
+          for (let topic in topics) {
+              let responseDelete = await fetch(`https://iid.googleapis.com/iid/v1/${token}/rel/topics/${topic}`, {
+                  method: 'DELETE',
+                  headers: { 'Content-Type': 'application/json', 'Authorization': "key=" + fcm_key }
+              });
+              if (responseDelete.error) log_events("ERROR deleting topics: " + responseDelete.error.toString());
+          }
+      }
+      reply.send({ success: true });
+      return;
+  } catch (e) {
+      log_events("ERROR fetch deleting topics: " + e.toString());
+      reply.send({ success: false });
+      return;
+  }
+});
+
+server.get('/gwl/subscribe/:token/:address', async function (request, reply) {
+  const token = request.params.token;
+  const address = request.params.address;
+  log_events(`Subscribe request by: ${token}`)
+  try {
+      // Subscribe the token to the topic (address)
+      let response = await fetch(`https://iid.googleapis.com/iid/v1/${token}/rel/topics/${address}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': "key=" + fcm_key }
+      });
+      response = await response.json();
+      if (response.error) {
+          log_events("ERROR subscribing to topic: " + response.error.toString());
+          reply.send({ success: false });
+          return;
+      }
+      reply.send({ success: true });
+      return;
+  } catch (e) {
+      log_events("ERROR fetch subscribing to topic: " + e.toString());
+      reply.send({ success: false });
+      return;
   }
 });
 
