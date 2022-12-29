@@ -5,14 +5,11 @@ import {ElectrumClient} from '@samouraiwallet/electrum-client';
 import garlicoinjs from 'garlicoinjs-lib';
 import fetch from 'node-fetch';
 import os from 'os';
-import fs from 'fs';
+import { readFileSync } from 'fs';
 
 let seedServer
 let client
 let clientMap
-
-const privateKey = fs.readFileSync('./privkey.pem', 'utf8');
-const certificate = fs.readFileSync('./fullchain.pem', 'utf8');
 const fcm_key = process.env.FCM_KEY;
 
 const server = fastify({
@@ -38,8 +35,9 @@ const server = fastify({
     }
   },
   https: {
-    key: privateKey,
-    cert: certificate
+    allowHTTP1: true,
+    key: readFileSync('./privkey.pem', 'utf8'),
+    cert: readFileSync('./fullchain.pem', 'utf8')
   }
 });
 
@@ -358,13 +356,13 @@ server.get('/gwl/delete/:token', async function (request, reply) {
                   method: 'DELETE',
                   headers: { 'Content-Type': 'application/json', 'Authorization': "key=" + fcm_key }
               });
-              if (responseDelete.error) log_events("ERROR deleting topics: " + responseDelete.error.toString());
+              if (responseDelete.error) fastify.log.error("ERROR deleting topics: " + responseDelete.error.toString());
           }
       }
       reply.send({ success: true });
       return;
   } catch (e) {
-      log_events("ERROR fetch deleting topics: " + e.toString());
+      fastify.log.error("ERROR fetch deleting topics: " + e.toString());
       reply.send({ success: false });
       return;
   }
@@ -373,7 +371,7 @@ server.get('/gwl/delete/:token', async function (request, reply) {
 server.get('/gwl/subscribe/:token/:address', async function (request, reply) {
   const token = request.params.token;
   const address = request.params.address;
-  log_events(`Subscribe request by: ${token}`)
+  fastify.log.info(`Subscribe request by: ${token}`)
   try {
       // Subscribe the token to the topic (address)
       let response = await fetch(`https://iid.googleapis.com/iid/v1/${token}/rel/topics/${address}`, {
@@ -382,21 +380,21 @@ server.get('/gwl/subscribe/:token/:address', async function (request, reply) {
       });
       response = await response.json();
       if (response.error) {
-          log_events("ERROR subscribing to topic: " + response.error.toString());
+          fastify.log.error("ERROR subscribing to topic: " + response.error.toString());
           reply.send({ success: false });
           return;
       }
       reply.send({ success: true });
       return;
   } catch (e) {
-      log_events("ERROR fetch subscribing to topic: " + e.toString());
+      fastify.log.error("ERROR fetch subscribing to topic: " + e.toString());
       reply.send({ success: false });
       return;
   }
 });
 
 // Start the server
-server.listen({ port: 3000, host: '0.0.0.0' }, async (error, address) => {
+server.listen({ port: 443, host: '0.0.0.0' }, async (error, address) => {
 
   if (error) {
     console.error(error);
