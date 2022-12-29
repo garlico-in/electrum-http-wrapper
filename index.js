@@ -34,6 +34,7 @@ const server = fastify({
       }
     }
   },
+  http2: true,
   https: {
     allowHTTP1: true,
     key: readFileSync('./privkey.pem', 'utf8'),
