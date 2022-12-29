@@ -14,6 +14,6 @@ COPY privkey.pem /root/electrum-http-wrapper/
 
 RUN npm install
 
-EXPOSE 443
+EXPOSE 3000
 
 ENTRYPOINT [ "node", "index.js" ]

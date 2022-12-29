@@ -34,12 +34,6 @@ const server = fastify({
       }
     }
   },
-  http2: true,
-  https: {
-    allowHTTP1: true,
-    key: readFileSync('./privkey.pem', 'utf8'),
-    cert: readFileSync('./fullchain.pem', 'utf8')
-  }
 });
 
 async function initServer() {
@@ -395,7 +389,7 @@ server.get('/gwl/subscribe/:token/:address', async function (request, reply) {
 });
 
 // Start the server
-server.listen({ port: 443, host: '0.0.0.0' }, async (error, address) => {
+server.listen({ port: 3000, host: '0.0.0.0' }, async (error, address) => {
 
   if (error) {
     console.error(error);
