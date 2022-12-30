@@ -317,76 +317,7 @@ server.post('/api/GRLC/mainnet/tx/send', async (request, reply) => {
   }
 });
 
-server.get('/gwl/delete/:token', async function (request, reply) {
-  const token = request.params.token;
-  fastify.log.info(`Delete request by: ${token}`)
-  let topics;
-  try {
-      // Get all topics the token is subscribed to, in order to then delete them one by one
-      let sub_topics = [];
-      let response = await fetch(`https://iid.googleapis.com/iid/info/${token}?details=true`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json', 'Authorization': "key=" + fcm_key }
-      });
-      response = await response.json();
-      topics = response.rel?.topics || [];
-      for (let topic in topics) sub_topics.push(topic);
-      if (response.error) {
-          fastify.log.error("ERROR retrieving subscribed topics: " + response.error.toString());
-          topics = "error";
-      };
-  } catch (e) {
-      topics = "error";
-      fastify.log.error("ERROR fetching subscribed topics: " + e.toString());
-  }
-  if (topics == "error") {
-      reply.send({ success: false });
-      return;
-  }
-  // Delete all topics the token is subscribed to
-  try {
-      if (topics) {
-          for (let topic in topics) {
-              let responseDelete = await fetch(`https://iid.googleapis.com/iid/v1/${token}/rel/topics/${topic}`, {
-                  method: 'DELETE',
-                  headers: { 'Content-Type': 'application/json', 'Authorization': "key=" + fcm_key }
-              });
-              if (responseDelete.error) fastify.log.error("ERROR deleting topics: " + responseDelete.error.toString());
-          }
-      }
-      reply.send({ success: true });
-      return;
-  } catch (e) {
-      fastify.log.error("ERROR fetch deleting topics: " + e.toString());
-      reply.send({ success: false });
-      return;
-  }
-});
 
-server.get('/gwl/subscribe/:token/:address', async function (request, reply) {
-  const token = request.params.token;
-  const address = request.params.address;
-  fastify.log.info(`Subscribe request by: ${token}`)
-  try {
-      // Subscribe the token to the topic (address)
-      let response = await fetch(`https://iid.googleapis.com/iid/v1/${token}/rel/topics/${address}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': "key=" + fcm_key }
-      });
-      response = await response.json();
-      if (response.error) {
-          fastify.log.error("ERROR subscribing to topic: " + response.error.toString());
-          reply.send({ success: false });
-          return;
-      }
-      reply.send({ success: true });
-      return;
-  } catch (e) {
-      fastify.log.error("ERROR fetch subscribing to topic: " + e.toString());
-      reply.send({ success: false });
-      return;
-  }
-});
 
 // Start the server
 server.listen({ port: 3000, host: '0.0.0.0' }, async (error, address) => {
